@@ -5,6 +5,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import GroupMembers from "../components/groups/GroupMembers";
 import UpdateGroupForm from "../components/groups/UpdateGroupForm";
 import GroupJoinCode from "../components/groups/GroupJoinCode";
+import GroupCelebrations from "../components/groups/GroupCelebrations";
 
 export default function GroupPage() {
 
@@ -13,7 +14,7 @@ export default function GroupPage() {
    const deleteMutation = useDeleteGroup();
    const { id:groupId } = useParams<{ id: string }>();
    const id = Number(groupId);
-   const groupQuery = useGroupQuery(id ?? "");
+   const groupQuery = useGroupQuery(id);
 
    if (!id || !Number.isFinite(Number(id)) || Number(id) <= 0) {
       return <p>מזהה קבוצה לא תקין</p>;
@@ -76,7 +77,7 @@ export default function GroupPage() {
          <h1>{group.name}</h1>
          <p>תפקיד: {group.myRole === "MANAGER" ? "מנהלת" : "חברה"}</p>
          <p>מספר חברות וחברים: {group.memberCount}</p>
-
+         <GroupCelebrations groupId={group.id}></GroupCelebrations>
 
          <GroupMembers
             groupId={group.id}

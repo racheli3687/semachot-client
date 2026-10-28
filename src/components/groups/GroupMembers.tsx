@@ -2,6 +2,7 @@
 import { useGroupMembersQuery, useRemoveGroupMember } from "../../hooks/useGroups";
 import Loading from "../Loading";
 import ErrorMessage from "../ErrorMessage";
+import { useAuth } from "../../hooks/useAuth";
 
 interface GroupMembersProps {
   groupId: number;
@@ -16,10 +17,11 @@ export default function GroupMembers({
     useGroupMembersQuery(groupId);
 
   const removeMutation = useRemoveGroupMember();
+  const { user } = useAuth();
 
   async function handleRemove(userId: number, fullName: string) {
     const confirmed = window.confirm(
-      `האם להסיר את ${fullName} מהקבוצה?`
+      `האם להסיר את ${fullName} מהקבוצה? השמחות שלה יוסרו מהקבוצה.`
     );
 
     if (!confirmed) return;
@@ -56,9 +58,11 @@ export default function GroupMembers({
           <li key={member.userId}>
             <strong>{member.fullName}</strong>
             <p>תפקיד: {member.role === "MANAGER" ? "מנהלת" : "חברה"}</p>
-            <p>דוא״ל: {member.email}</p>
+            <p>
+              דוא״ל: <a href={`mailto:${member.email}`}>{member.email}</a>
+            </p>
 
-            {isManager && member.role !== "MANAGER" && (
+            {isManager && member.userId !== user?.id && (
               <button
                 type="button"
                 disabled={removeMutation.isPending}
@@ -66,8 +70,9 @@ export default function GroupMembers({
                   handleRemove(member.userId, member.fullName)
                 }
               >
-                {removeMutation.isPending
-                  ? "מסיר..."
+                {removeMutation.isPending &&
+                  removeMutation.variables?.userId === member.userId
+                  ? "מסירה..."
                   : "הסרת חברה"}
               </button>
             )}

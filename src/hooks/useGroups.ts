@@ -131,7 +131,7 @@ export function useRemoveGroupMember() {
 
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["groupMembers", variables.groupId],
+        queryKey: ["groups", variables.groupId,"members"],
       });
 
       queryClient.invalidateQueries({
@@ -152,7 +152,7 @@ export function useLeaveGroup() {
         queryKey: ["groups", groupId],
       });
       queryClient.removeQueries({
-        queryKey: ["groupMembers", groupId],
+        queryKey: ["groups", groupId,"members"],
       });
 
       queryClient.invalidateQueries({
@@ -181,6 +181,10 @@ export function useDeleteGroup() {
 
       queryClient.invalidateQueries({
         queryKey: ["groups"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["celebrations"],
       });
     },
   });
