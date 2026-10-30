@@ -1,32 +1,217 @@
-# React + TypeScript + Vite
+# לוח שמחות
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+אתר שבו משפחות וקבוצות חברים משתפות את השמחות שלהן במקום אחד.
+כל חבר/ה מעלה הזמנה לשמחה, וכולם רואים לוח מסודר של השמחות הקרובות, לפי תאריך עברי.
 
-Currently, two official plugins are available:
+פרויקט גמר: אתר React + TypeScript שמתחבר לשרת Node.js / Express.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## קישורים
 
-## React Compiler
+| | כתובת |
+|---|---|
+| האתר באוויר | https://semachot-frontend.onrender.com |
+| השרת (API) | https://semachot-api.onrender.com |
+| תיעוד ה־API ‏(Swagger) | https://semachot-api.onrender.com/api-docs |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> השרת רץ במסלול החינמי של Render ו"נרדם" אחרי 15 דקות בלי פניות. לכן הכניסה הראשונה יכולה לקחת עד דקה. האתר מציג בזמן הזה מסך טעינה.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## מה אפשר לעשות באתר
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **קבוצות:** כל משתמש/ת יכול/ה לפתוח קבוצה ולהצטרף לקבוצות אחרות בעזרת קוד הצטרפות בן 8 תווים.
+- **שני תפקידים בכל קבוצה:** מנהל/ת (מי שפתח/ה) וחבר/ה. אותו אדם יכול להיות מנהל/ת בקבוצה אחת וחבר/ה באחרת.
+- **שמחות:** הוספה, עריכה ומחיקה של שמחה, עם תאריך עברי, שעה, מקום, תיאור ותמונת הזמנה. אפשר לשתף שמחה בכמה קבוצות.
+- **לוח אישי:** כל השמחות מכל הקבוצות במקום אחד, עם חיפוש, סינון ומיון.
+
+### הרשאות
+
+| פעולה | חבר/ה | מנהל/ת הקבוצה | בעל/ת השמחה |
+|---|---|---|---|
+| צפייה בשמחות ובחברי הקבוצה | ✅ | ✅ | ✅ |
+| הוספת שמחה בקבוצות שלי | ✅ | ✅ | ✅ |
+| עריכה, מחיקה ותמונה של שמחה | ❌ | ❌ | ✅ |
+| הסרת שמחה מהקבוצה | ❌ | ✅ | ✅ |
+| קוד הצטרפות, שינוי שם, הסרת חבר/ה, מחיקת קבוצה | ❌ | ✅ | |
+
+השרת בודק את ההרשאות בכל בקשה. האתר רק מסתיר כפתורים שאין הרשאה להשתמש בהם.
+
+---
+
+## מסכים
+
+| כתובת | מסך | מה יש בו |
+|---|---|---|
+| `/login` | התחברות | מייל וסיסמה |
+| `/register` | הרשמה | שם מלא, מייל וסיסמה, עם בדיקת תקינות בטופס |
+| `/` | הלוח שלי | שמחות היום, ווידג'טים, רשימה עם חיפוש, סינון, מיון ועמודים, ותצוגת לוח חודשי עברי |
+| `/groups` | הקבוצות שלי | רשימת הקבוצות, פתיחת קבוצה והצטרפות בקוד |
+| `/groups/:id` | דף קבוצה | שמחות הקבוצה, חברים, ולמנהל/ת: קוד הצטרפות, שינוי שם, הסרה ומחיקה |
+| `/celebrations/new` | הוספת שמחה | טופס עם בחירת תאריך עברי, קבוצות ותמונה |
+| `/celebrations/:id` | פרטי שמחה | כל הפרטים והתמונה, ופעולות לפי ההרשאות |
+| `/celebrations/:id/edit` | עריכת שמחה | אותו טופס, ממולא בנתונים הקיימים |
+| `/profile` | פרופיל | שינוי שם והגדרת תזכורות במייל |
+| כל כתובת אחרת | 404 | "הדף לא נמצא" |
+
+## פיצ'רים בולטים
+
+- **תאריך עברי מלא:** בחירת יום, חודש ושנה עבריים. בשנה מעוברת מופיעים אדר א׳ ואדר ב׳, ומספר הימים מתאים לחודש. מתחת לבחירה מוצג התאריך הלועזי ("יוצא ב־...").
+- **סינון לפי חודש עברי**, לפי קבוצה, סוג שמחה וזמן (קרובות / שעברו / הכל), חיפוש חופשי ו"רק השמחות שלי".
+- **הסינונים נשמרים בכתובת:** אחרי רענון הדף הסינון נשאר, וכפתור "אחורה" חוזר לסינון הקודם.
+- **שמחות היום:** כרטיס חגיגי עם אנימציית קונפטי.
+- **"בעוד X ימים"** לשמחה הקרובה, ולוח חודש קטן.
+- **מצב כהה**, הודעות קופצות (Toast) ושלד טעינה.
+- **טיפול בשגיאות:** הודעות השרת בעברית מוצגות ליד השדה המתאים בטופס. כשתוקף ההתחברות פג, המשתמש/ת מועבר/ת למסך ההתחברות.
+- **מותאם לטלפון:** בטלפון מופיע סרגל צף בתחתית המסך, עם כפתור להוספת שמחה.
+
+---
+
+## טכנולוגיות
+
+| תחום | ספרייה |
+|---|---|
+| בסיס | React, TypeScript, Vite |
+| ניתוב | React Router |
+| נתונים מהשרת | TanStack React Query |
+| טפסים | React Hook Form |
+| עיצוב | Tailwind CSS 4 (`@tailwindcss/vite`) |
+| אנימציות | motion, canvas-confetti |
+| פונט | Heebo, מוטמע בפרויקט (`src/assets/fonts`) |
+| בדיקת קוד | oxlint |
+
+האייקונים כתובים בקוד עצמו (`components/ui/Icon.tsx`), בלי ספריית אייקונים.
+
+### צד השרת (בפרויקט נפרד)
+Node.js, Express, TypeScript, PostgreSQL (Neon), Prisma, התחברות עם JWT ותיעוד Swagger.
+
+---
+
+## מבנה הפרויקט
+
+```
+src/
+├── api/            פונקציות לכל הכתובות בשרת, ו־ApiError
+├── assets/fonts/   הפונט Heebo
+├── components/
+│   ├── calendar/       תצוגת הלוח החודשי העברי
+│   ├── celebrations/   כרטיס שמחה, טופס, סינונים
+│   ├── dashboard/      ווידג'טים של הלוח שלי
+│   ├── groups/         רכיבי הקבוצות
+│   └── ui/             כפתורים, אייקונים, טעינה, Toast
+├── context/        AuthContext (מצב ההתחברות)
+├── hooks/          useAuth, useGroups, useCelebrations, useHebrewCalendar,
+│                   useProfile, useTheme, useToast
+├── pages/          המסכים
+├── types/          הטיפוסים של הנתונים מהשרת
+└── utils/          תאריכים, לוח עברי, סינונים, ספירה לאחור ועוד
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## הרצה מקומית
+
+### דרישות
+- **Node.js 22** (או לפחות 20.19). Vite דורש גרסה חדשה.
+- שרת פועל: השרת בענן, או השרת מקומית על `http://localhost:3000`.
+
+### שלבים
+
+1. הורדת הקוד:
+   ```bash
+   git clone https://github.com/<שם-המשתמש>/semachot-client.git
+   cd semachot-client
+   ```
+2. התקנת הספריות:
+   ```bash
+   npm install
+   ```
+3. יצירת קובץ משתני הסביבה: מעתיקים את `.env.example` לקובץ חדש בשם `.env`, ומעדכנים בו את כתובת השרת (ראו למטה).
+4. הרצה:
+   ```bash
+   npm run dev
+   ```
+5. פותחים בדפדפן את `http://localhost:5173`.
+
+### פקודות
+
+| פקודה | מה היא עושה |
+|---|---|
+| `npm run dev` | מריצה את האתר במצב פיתוח |
+| `npm run build` | בונה את גרסת הייצור לתיקייה `dist` (כולל בדיקת TypeScript) |
+| `npm run preview` | מריצה את הגרסה שנבנתה, לבדיקה לפני פריסה |
+| `npx oxlint` | בודקת את הקוד ומתריעה על בעיות |
+
+---
+
+## משתני סביבה
+
+| משתנה | דוגמה | הסבר |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:3000` | כתובת השרת, **בלי** `/` בסוף |
+
+- בפיתוח מול השרת בענן: `VITE_API_URL=https://semachot-api.onrender.com`
+- הקובץ `.env` לא עולה ל־GitHub. הקובץ `.env.example` כן עולה, כדוגמה.
+- Vite מכניס את הערך לקבצים בזמן ה־Build. לכן אחרי שינוי שלו בענן צריך לבנות ולפרוס מחדש.
+
+---
+
+## פריסה ב־Render
+
+האתר פרוס כ־**Static Site** חינמי ב־Render (אתר סטטי לא "נרדם").
+
+### הגדרות האתר
+
+| שדה | ערך |
+|---|---|
+| Branch | `main` |
+| Build Command | `npm ci && npm run build` |
+| Publish Directory | `dist` |
+
+### משתני סביבה באתר
+
+| Key | Value |
+|---|---|
+| `VITE_API_URL` | `https://semachot-api.onrender.com` |
+| `NODE_VERSION` | `22` |
+
+### ניתוב (חובה)
+תחת **Redirects/Rewrites**:
+
+| Source | Destination | Action |
+|---|---|---|
+| `/*` | `/index.html` | Rewrite |
+
+בלי ההגדרה הזו, רענון בכתובת פנימית כמו `/groups/3` מחזיר 404.
+
+### הגדרות בצד השרת (CORS)
+בשירות השרת ב־Render צריך לאשר את כתובת האתר:
+
+```
+CORS_ORIGINS=http://localhost:5173,https://semachot-frontend.onrender.com
+FRONTEND_URL=https://semachot-frontend.onrender.com
+```
+
+כל דחיפה (push) לענף `main` ב־GitHub בונה ופורסת את האתר מחדש באופן אוטומטי.
+
+---
+
+## משתמשי הדגמה
+
+| מייל | מה רואים |
+|---|---|
+| `manager@example.com` | מנהלת "משפחת כהן", וחברה רגילה ב"חברות מהסמינר" |
+| `member@example.com` | מנהלת "חברות מהסמינר", וחברה רגילה ב"משפחת כהן" |
+| `outsider@example.com` | מנהלת "שכנים ברחוב הרימון" בלבד, ולא רואה את השמחות של השתיים האחרות |
+
+בהרצה מקומית הסיסמה היא `Demo1234`. הסיסמה בענן נמסרת בנפרד.
+
+---
+
+## הערות
+
+- **תזכורות במייל:** ההגדרה בפרופיל כבר נשמרת בשרת. שליחת המיילים עצמה תופעל בהמשך.
+- כל הממשק בעברית ומימין לשמאל.
+
+---
+
+נבנה על ידי [השם שלך] כפרויקט גמר.
