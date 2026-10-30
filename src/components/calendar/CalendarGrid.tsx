@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import type { Celebration } from "../../types";
 import { WEEKDAY_LETTERS } from "../../utils/hebrewCalendar";
 import { addDays } from "../../utils/dates";
@@ -24,9 +25,9 @@ export default function CalendarGrid({
     ];
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1.5">
             {WEEKDAY_LETTERS.map((name) => (
-                <div key={name} style={{ textAlign: "center", fontWeight: "bold" }}>
+                <div key={name} className={`pb-2 text-center text-xs font-semibold sm:text-sm ${name === "ש׳" ? "text-accent" : "text-muted"}`}>
                     {name}
                 </div>
             ))}
@@ -35,15 +36,24 @@ export default function CalendarGrid({
                 day === null ? (
                     <div key={`empty-${index}`} />
                 ) : (
-                    <CalendarDay
+                    <motion.div
                         key={day}
-                        day={day}
-                        gregorianDay={Number(addDays(firstDate, day - 1).slice(8, 10))}
-                        count={celebrationsByDay.get(day)?.length ?? 0}
-                        isToday={day === todayDay}
-                        isSelected={day === selectedDay}
-                        onSelect={() => onSelectDay(day)}
-                    />
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.012, duration: 0.25 }}
+                        className="flex"
+                    >
+                        <div className="flex-1 [&>button]:size-full">
+                            <CalendarDay
+                                day={day}
+                                gregorianDay={Number(addDays(firstDate, day - 1).slice(8, 10))}
+                                count={celebrationsByDay.get(day)?.length ?? 0}
+                                isToday={day === todayDay}
+                                isSelected={day === selectedDay}
+                                onSelect={() => onSelectDay(day)}
+                            />
+                        </div>
+                    </motion.div>
                 )
             )}
         </div>

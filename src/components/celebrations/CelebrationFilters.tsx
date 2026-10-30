@@ -10,6 +10,7 @@ import {
     type DashboardView,
 } from "../../utils/celebrationFilters";
 import SearchBox from "./SearchBox";
+import Icon from "../ui/Icon";
 
 interface CelebrationFiltersProps {
     view: DashboardView;
@@ -58,18 +59,19 @@ export default function CelebrationFilters({
     const hasFilters = [...values.keys()].some((key) => key !== "view");
 
     return (
-        <section aria-label="סינון שמחות">
-            <SearchBox
-                key={values.get("search") ?? ""}
-                initialValue={values.get("search") ?? ""}
-                onSearch={(text) => onChange("search", text)}
-            />
+        <section aria-label="סינון שמחות" className="mb-6 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+                <SearchBox
+                    key={values.get("search") ?? ""}
+                    initialValue={values.get("search") ?? ""}
+                    onSearch={(text) => onChange("search", text)}
+                />
 
-            {/* קבוצה */}
-            <div>
-                <label htmlFor="group-filter">קבוצה</label>
+                {/* קבוצה */}
+                <label htmlFor="group-filter" className="sr-only">קבוצה</label>
                 <select
                     id="group-filter"
+                    className="input input-pill w-auto"
                     value={values.get("groupId") ?? ""}
                     onChange={(event) => onChange("groupId", event.target.value || undefined)}
                 >
@@ -80,13 +82,12 @@ export default function CelebrationFilters({
                         </option>
                     ))}
                 </select>
-            </div>
 
-            {/* סוג */}
-            <div>
-                <label htmlFor="type-filter">סוג שמחה</label>
+                {/* סוג */}
+                <label htmlFor="type-filter" className="sr-only">סוג שמחה</label>
                 <select
                     id="type-filter"
+                    className="input input-pill w-auto"
                     value={values.get("type") ?? ""}
                     onChange={(event) => onChange("type", event.target.value || undefined)}
                 >
@@ -97,64 +98,15 @@ export default function CelebrationFilters({
                         </option>
                     ))}
                 </select>
-            </div>
 
-            {/* רק שלי */}
-            <div>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={values.get("mine") === "true"}
-                        onChange={(event) =>
-                            onChange("mine", event.target.checked ? "true" : undefined)
-                        }
-                    />
-                    השמחות שלי בלבד
-                </label>
-            </div>
-
-            {/* שדות שמתאימים רק לתצוגת רשימה */}
-            {view === "list" && (
-                <>
-                    {/* מועד */}
-                    <fieldset>
-                        <legend>מועד השמחה</legend>
-                        {CELEBRATION_WHEN.map((when) => (
-                            <button
-                                key={when}
-                                type="button"
-                                aria-pressed={currentWhen === when}
-                                onClick={() =>
-                                    onChange("when", when === "upcoming" ? undefined : when)
-                                }
-                            >
-                                {WHEN_LABELS[when]}
-                            </button>
-                        ))}
-                    </fieldset>
-
-                    {/* מיון */}
-                    <div>
-                        <label htmlFor="sort-filter">מיון</label>
-                        <select
-                            id="sort-filter"
-                            value={values.get("sort") ?? ""}
-                            onChange={(event) => onChange("sort", event.target.value || undefined)}
-                        >
-                            <option value="">מיון ברירת מחדל</option>
-                            {CELEBRATION_SORTS.map((sort) => (
-                                <option key={sort} value={sort}>
-                                    {SORT_LABELS[sort]}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* שנה עברית */}
-                    <div>
-                        <label htmlFor="year-filter">שנה</label>
+                {/* שדות שמתאימים רק לתצוגת רשימה */}
+                {view === "list" && (
+                    <>
+                        {/* שנה עברית */}
+                        <label htmlFor="year-filter" className="sr-only">שנה</label>
                         <select
                             id="year-filter"
+                            className="input input-pill w-auto"
                             value={values.get("hebrewYear") ?? ""}
                             disabled={!currentYear}
                             onChange={(event) => onHebrewYearChange(event.target.value || undefined)}
@@ -166,14 +118,12 @@ export default function CelebrationFilters({
                                 </option>
                             ))}
                         </select>
-                        {monthsData?.yearText && <span> {monthsData.yearText}</span>}
-                    </div>
 
-                    {/* חודש עברי */}
-                    <div>
-                        <label htmlFor="month-filter">חודש</label>
+                        {/* חודש עברי */}
+                        <label htmlFor="month-filter" className="sr-only">חודש</label>
                         <select
                             id="month-filter"
+                            className="input input-pill w-auto"
                             value={values.get("hebrewMonth") ?? ""}
                             disabled={!selectedYear}
                             onChange={(event) =>
@@ -187,17 +137,71 @@ export default function CelebrationFilters({
                                 </option>
                             ))}
                         </select>
+                    </>
+                )}
+            </div>
 
-                        {selectedYear && !values.get("hebrewMonth") && (
-                            <small>בחרי גם חודש כדי לסנן</small>
-                        )}
-                    </div>
-                </>
-            )}
+            <div className="flex flex-wrap items-center gap-2.5">
+                {view === "list" && (
+                    <>
+                        {/* מועד */}
+                        <fieldset>
+                            <legend className="sr-only">מועד השמחה</legend>
+                            <div className="segmented">
+                                {CELEBRATION_WHEN.map((when) => (
+                                    <button
+                                        key={when}
+                                        type="button"
+                                        aria-pressed={currentWhen === when}
+                                        onClick={() =>
+                                            onChange("when", when === "upcoming" ? undefined : when)
+                                        }
+                                    >
+                                        {WHEN_LABELS[when]}
+                                    </button>
+                                ))}
+                            </div>
+                        </fieldset>
 
-            <button type="button" disabled={!hasFilters} onClick={onClear}>
-                ניקוי סינונים
-            </button>
+                        {/* מיון */}
+                        <label htmlFor="sort-filter" className="sr-only">מיון</label>
+                        <select
+                            id="sort-filter"
+                            className="input input-pill w-auto py-1.5 text-sm"
+                            value={values.get("sort") ?? ""}
+                            onChange={(event) => onChange("sort", event.target.value || undefined)}
+                        >
+                            <option value="">מיון: ברירת מחדל</option>
+                            {CELEBRATION_SORTS.map((sort) => (
+                                <option key={sort} value={sort}>
+                                    {SORT_LABELS[sort]}
+                                </option>
+                            ))}
+                        </select>
+                    </>
+                )}
+
+                {/* רק שלי */}
+                <label className="flex cursor-pointer items-center gap-2 rounded-full bg-surface px-4 py-1.5 text-sm font-medium ring-1 ring-line transition-colors has-[:checked]:bg-accent-soft has-[:checked]:text-accent has-[:checked]:ring-accent/30">
+                    <input
+                        type="checkbox"
+                        className="checkbox size-4"
+                        checked={values.get("mine") === "true"}
+                        onChange={(event) =>
+                            onChange("mine", event.target.checked ? "true" : undefined)
+                        }
+                    />
+                    השמחות שלי בלבד
+                </label>
+
+                {selectedYear && !values.get("hebrewMonth") && view === "list" && (
+                    <small className="text-xs font-medium text-sys-orange">בחרי גם חודש כדי לסנן</small>
+                )}
+
+                <button type="button" className="btn btn-ghost btn-sm ms-auto" disabled={!hasFilters} onClick={onClear}>
+                    <Icon name="reset" /> ניקוי סינונים
+                </button>
+            </div>
         </section>
     );
 }

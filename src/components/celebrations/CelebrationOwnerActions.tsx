@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDeleteCelebration } from "../../hooks/useCelebrations";
 import ErrorMessage from "../ErrorMessage";
+import Icon from "../ui/Icon";
 
 type CelebrationOwnerActionsProps = {
     celebrationId: number;
@@ -26,16 +27,21 @@ export default function CelebrationOwnerActions({ celebrationId, title }: Celebr
     }
 
     return (
-        <section aria-label="ניהול השמחה">
-            <Link to={`/celebrations/${celebrationId}/edit`}>עריכה</Link>
+        <section aria-label="ניהול השמחה" className="panel flex flex-col gap-4">
+            <h2 className="card-title">ניהול השמחה</h2>
+            <p className="hint">השמחה שלך - אפשר לעדכן פרטים או למחוק אותה.</p>
+            <div className="mt-auto flex flex-wrap gap-3">
+                <Link to={`/celebrations/${celebrationId}/edit`} className="btn btn-dark"><Icon name="pencil" /> עריכה</Link>
 
-            <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleteMutation.isPending}
-            >
-                {deleteMutation.isPending ? "מוחקת..." : "מחיקת השמחה"}
-            </button>
+                <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={handleDelete}
+                    disabled={deleteMutation.isPending}
+                >
+                    <Icon name="trash" /> {deleteMutation.isPending ? "מוחקת..." : "מחיקת השמחה"}
+                </button>
+            </div>
 
             {deleteMutation.isError && <ErrorMessage error={deleteMutation.error} />}
         </section>

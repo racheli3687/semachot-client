@@ -98,10 +98,10 @@ export default function CelebrationCalendarView({
     const title = `${monthInfo.name} ${monthsQuery.data?.yearText ?? ""}`;
 
     return (
-        <section aria-label="לוח שמחות חודשי">
+        <section aria-label="לוח שמחות חודשי" className="panel">
             <CalendarHeader title={title} onPrev={goPrev} onNext={goNext} />
 
-            <div style={{ opacity: celebrationsQuery.isPlaceholderData ? 0.5 : 1 }}>
+            <div className={`transition-opacity duration-300 ${celebrationsQuery.isPlaceholderData ? "opacity-50" : ""}`}>
                 <CalendarGrid
                     daysInMonth={monthInfo.days}
                     firstWeekday={weekdayOf(firstDayQuery.data.date)}
@@ -118,7 +118,7 @@ export default function CelebrationCalendarView({
             {celebrationsQuery.isError && <ErrorMessage error={celebrationsQuery.error} />}
 
             {data && data.total > data.items.length && (
-                <p>מוצגות {data.items.length} השמחות הראשונות מתוך {data.total}. אפשר לצמצם בעזרת הסינון.</p>
+                <p className="hint mt-4 text-center">מוצגות {data.items.length} השמחות הראשונות מתוך {data.total}. אפשר לצמצם בעזרת הסינון.</p>
             )}
 
             {shownDay !== null && (

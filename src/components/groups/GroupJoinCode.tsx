@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRegenerateJoinCode } from "../../hooks/useGroups";
 import ErrorMessage from "../ErrorMessage";
+import { useToast } from "../../hooks/useToast";
+import { AnimatePresence, motion } from "motion/react";
+import Icon from "../ui/Icon";
 
 interface GroupJoinCodeProps {
   groupId: number;
@@ -15,6 +18,7 @@ export default function GroupJoinCode({
 }: GroupJoinCodeProps) {
   const regenerateMutation = useRegenerateJoinCode();
   const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
 
   async function handleCopy() {
      if (!currentCode) return;
@@ -23,7 +27,7 @@ export default function GroupJoinCode({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      alert("לא הצלחנו להעתיק. אפשר לסמן ולהעתיק ידנית.");
+      showToast("לא הצלחנו להעתיק. אפשר לסמן ולהעתיק ידנית.", "error");
     }
   }
 
@@ -44,27 +48,43 @@ export default function GroupJoinCode({
   }
 
   return (
-    <section>
-      <h2>קוד הצטרפות</h2>
+    <section className="panel relative overflow-hidden">
+      <h2 className="card-title">קוד הצטרפות</h2>
+      <p className="hint mb-4">שלחי את הקוד למי שתרצי להזמין לקבוצה.</p>
 
-      <p>
-        {currentCode || "עדיין לא מוצג קוד הצטרפות"}
-      </p>
-      <button type="button" onClick={handleCopy}>
-        {copied ? "הועתק ✓" : "העתקה"}
-      </button>
-      <button
-        type="button"
-        onClick={handleRegenerate}
-        disabled={regenerateMutation.isPending}
-      >
-        {regenerateMutation.isPending
-          ? "יוצר קוד חדש..."
-          : "יצירת קוד חדש"}
-      </button>
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={currentCode ?? "none"}
+          initial={{ opacity: 0, rotateX: 90 }}
+          animate={{ opacity: 1, rotateX: 0 }}
+          exit={{ opacity: 0, rotateX: -90 }}
+          transition={{ duration: 0.3 }}
+          dir="ltr"
+          className="mb-4 rounded-2xl bg-gradient-to-br from-[#ff9f6b] via-[#ff6fa8] to-[#4fb6ff] p-[2px]"
+        >
+          <span className="block rounded-[0.9rem] bg-surface py-4 text-center font-mono text-2xl font-bold tracking-[0.3em] text-ink select-all">
+            {currentCode || "עדיין לא מוצג קוד הצטרפות"}
+          </span>
+        </motion.p>
+      </AnimatePresence>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" className={`btn flex-1 ${copied ? "bg-sys-green text-white" : "btn-primary"}`} onClick={handleCopy}>
+          <Icon name={copied ? "check" : "copy"} /> {copied ? "הועתק" : "העתקה"}
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary flex-1"
+          onClick={handleRegenerate}
+          disabled={regenerateMutation.isPending}
+        >
+          {regenerateMutation.isPending
+            ? "יוצרת קוד חדש..."
+            : <><Icon name="refresh" /> קוד חדש</>}
+        </button>
+      </div>
 
       {regenerateMutation.isError && (
-        <ErrorMessage error={regenerateMutation.error} />
+        <div className="mt-3"><ErrorMessage error={regenerateMutation.error} /></div>
       )}
     </section>
   );

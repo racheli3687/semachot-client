@@ -2,7 +2,10 @@
 import { useCelebrationsQuery, useRemoveCelebrationFromGroup } from "../../hooks/useCelebrations";
 import CelebrationCard from "../celebrations/CelebrationCard";
 import EmptyState from "../EmptyState";
-import Loading from "../Loading";
+import { CardSkeletonGrid } from "../Skeleton";
+import { motion } from "motion/react";
+import { fadeUp, stagger } from "../../utils/motion";
+import Icon from "../ui/Icon";
 import ErrorMessage from "../ErrorMessage";
 import { Link } from "react-router-dom";
 
@@ -40,7 +43,7 @@ export default function GroupCelebrations({
   }
 
   if (isPending) {
-    return <Loading message="טוען את שמחות הקבוצה..." />;
+    return <CardSkeletonGrid count={4} label="טוען את שמחות הקבוצה..." />;
   }
 
   if (isError) {
@@ -50,28 +53,32 @@ export default function GroupCelebrations({
   if (!data || data.items.length === 0) {
     return (
       <EmptyState message="עוד אין שמחות בקבוצה">
-        <Link to="/celebrations/new">הוספת שמחה</Link>
+        <Link to="/celebrations/new" className="btn btn-primary"><Icon name="plus" /> הוספת שמחה</Link>
       </EmptyState>
     );
   }
 
   return (
     <section>
-      <h2>שמחות קרובות</h2>
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <h2 className="section-title">שמחות קרובות</h2>
+        <Link to={`/?groupId=${groupId}`} className="flex items-center gap-1 text-[0.95rem] font-medium">לכל השמחות <Icon name="arrowLeft" className="size-4" /></Link>
+      </div>
 
       {removeMutation.isError && (
-        <ErrorMessage error={removeMutation.error} />
+        <div className="mb-3"><ErrorMessage error={removeMutation.error} /></div>
       )}
 
-      <ul>
+      <motion.ul initial="hidden" animate="show" variants={stagger(0.06)} className="list">
         {data.items.map((celebration) => (
-          <li key={celebration.id}>
+          <motion.li key={celebration.id} variants={fadeUp}>
             <CelebrationCard celebration={celebration}>
               {celebration.permissions.canRemoveFromGroupIds.includes(
                 groupId
               ) && (
                 <button
                   type="button"
+                  className="btn btn-danger btn-sm"
                   disabled={removeMutation.isPending}
                   onClick={() => handleRemove(celebration.id)}
                 >
@@ -83,9 +90,9 @@ export default function GroupCelebrations({
                 </button>
               )}
             </CelebrationCard>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </section>
   );
 }

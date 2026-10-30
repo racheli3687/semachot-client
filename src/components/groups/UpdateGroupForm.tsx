@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdateGroup } from "../../hooks/useGroups";
 import type { UpdateGroupRequest } from "../../types";
+import Icon from "../ui/Icon";
 
 interface UpdateGroupFormProps {
   groupId: number;
@@ -46,21 +47,23 @@ export default function UpdateGroupForm({
 
   if (!isEditing) {
     return (
-      <button type="button" onClick={() => setIsEditing(true)}>
-        שינוי שם הקבוצה
+      <button type="button" className="btn btn-secondary justify-start" onClick={() => setIsEditing(true)}>
+        <Icon name="pencil" /> שינוי שם הקבוצה
       </button>
     );
   }
 
   return (
-    <section>
-      <h2>שינוי שם הקבוצה</h2>
+    <section className="rounded-2xl bg-surface-2 p-4">
+      <h3 className="mb-3 text-base font-semibold">שינוי שם הקבוצה</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="group-name">שם הקבוצה החדש</label>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <label htmlFor="group-name" className="label">שם הקבוצה החדש</label>
 
         <input
           id="group-name"
+          className="input"
+          autoFocus
           {...register("name", {
             required: "יש להזין שם קבוצה",
             validate: (value) =>
@@ -73,15 +76,17 @@ export default function UpdateGroupForm({
           })}
         />
 
-        {errors.name && <p role="alert">{errors.name.message}</p>}
-        {errors.root && <p role="alert">{errors.root.message}</p>}
+        {errors.name && <p role="alert" className="field-error">{errors.name.message}</p>}
+        {errors.root && <p role="alert" className="form-alert">{errors.root.message}</p>}
 
-        <button type="submit" disabled={isSubmitting}>
+        <div className="flex gap-2">
+        <button type="submit" className="btn btn-primary btn-sm" disabled={isSubmitting}>
           {isSubmitting ? "שומרת..." : "שמירת השם"}
         </button>
 
         <button
           type="button"
+          className="btn btn-ghost btn-sm"
           onClick={() => {
             reset({ name: currentName });
             setIsEditing(false);
@@ -89,6 +94,7 @@ export default function UpdateGroupForm({
         >
           ביטול
         </button>
+        </div>
       </form>
     </section>
   );

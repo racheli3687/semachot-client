@@ -6,6 +6,7 @@ import GroupCheckBoxes from "./GroupCheckboxes"
 import HebrewDatePicker from "./HebrewDatePicker"
 import { isOneOf } from "../../utils/celebrationFilters"
 import { ApiError } from "../../api/api"
+import Icon from "../ui/Icon"
 
 type CelebrationFormProps =
     {
@@ -30,7 +31,7 @@ const SERVER_FIELDS: readonly (keyof CelebrationFormValues)[] = [
 ];
 
 
-export default function CelebrationForm({ defaultValues, groups, minYear, submitLabel, onCancel, onSubmit }: CelebrationFormProps) {
+export default function CelebrationForm({ defaultValues, groups, minYear, submitLabel, showImage, onCancel, onSubmit }: CelebrationFormProps) {
 
 
     const methods = useForm<CelebrationFormValues>({
@@ -83,139 +84,173 @@ export default function CelebrationForm({ defaultValues, groups, minYear, submit
 
     return (
         <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(submit)} noValidate>
-                {/* כותרת */}
-                <div>
-                    <label htmlFor="title">כותרת השמחה</label>
-                    <input
-                        id="title"
-                        {...register("title", {
-                            required: "יש להזין כותרת",
-                            validate: (value) => {
-                                const length = value.trim().length;
-                                return (
-                                    (length >= 2 && length <= 100) ||
-                                    "בין 2 ל־100 תווים"
-                                );
-                            },
-                        })}
-                    />
-                    {errors.title && (
-                        <p role="alert">{errors.title.message}</p>
-                    )}
+            <form onSubmit={handleSubmit(submit)} noValidate className="flex flex-col gap-6">
+                <div className="panel grid gap-5 sm:grid-cols-2">
+                    <h2 className="card-title flex items-center gap-3 sm:col-span-2">
+                        <span className="step" aria-hidden="true">1</span> מה חוגגים?
+                    </h2>
+
+                    {/* כותרת */}
+                    <div className="field sm:col-span-2">
+                        <label htmlFor="title" className="label">כותרת השמחה</label>
+                        <input
+                            id="title"
+                            className="input"
+                            placeholder="למשל: החתונה של משה ורבקה"
+                            {...register("title", {
+                                required: "יש להזין כותרת",
+                                validate: (value) => {
+                                    const length = value.trim().length;
+                                    return (
+                                        (length >= 2 && length <= 100) ||
+                                        "בין 2 ל־100 תווים"
+                                    );
+                                },
+                            })}
+                        />
+                        {errors.title && (
+                            <p role="alert" className="field-error">{errors.title.message}</p>
+                        )}
+                    </div>
+
+                    {/* סוג השמחה */}
+                    <div className="field">
+                        <label htmlFor="type" className="label">סוג השמחה</label>
+                        <select
+                            id="type"
+                            className="input"
+                            {...register("type", {
+                                required: "יש לבחור סוג שמחה",
+                            })}
+                        >
+                            <option value="">בחרי סוג</option>
+                            {celebrationTypes?.map((item) => (
+                                <option key={item.value} value={item.value}>
+                                    {item.label}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.type && (
+                            <p role="alert" className="field-error">{errors.type.message}</p>
+                        )}
+                    </div>
+
+                    {/* שעה */}
+                    <div className="field">
+                        <label htmlFor="time" className="label">שעה</label>
+                        <input
+                            id="time"
+                            type="time"
+                            className="input"
+                            {...register("time", {
+                                required: "יש לבחור שעה",
+                            })}
+                        />
+                        {errors.time && (
+                            <p role="alert" className="field-error">{errors.time.message}</p>
+                        )}
+                    </div>
                 </div>
 
-                {/* סוג השמחה */}
-                <div>
-                    <label htmlFor="type">סוג השמחה</label>
-                    <select
-                        id="type"
-                        {...register("type", {
-                            required: "יש לבחור סוג שמחה",
-                        })}
-                    >
-                        <option value="">בחרי סוג</option>
-                        {celebrationTypes?.map((item) => (
-                            <option key={item.value} value={item.value}>
-                                {item.label}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.type && (
-                        <p role="alert">{errors.type.message}</p>
-                    )}
-                </div>
                 <HebrewDatePicker minYear={minYear} />
-                {/* שעה */}
-                <div>
-                    <label htmlFor="time">שעה</label>
-                    <input
-                        id="time"
-                        type="time"
-                        {...register("time", {
-                            required: "יש לבחור שעה",
-                        })}
-                    />
-                    {errors.time && (
-                        <p role="alert">{errors.time.message}</p>
+
+                <div className="panel grid gap-5 sm:grid-cols-2">
+                    <h2 className="card-title flex items-center gap-3 sm:col-span-2">
+                        <span className="step" aria-hidden="true">3</span> איפה?
+                    </h2>
+
+                    {/* מקום */}
+                    <div className="field">
+                        <label htmlFor="venueName" className="label">מקום</label>
+                        <input
+                            id="venueName"
+                            className="input"
+                            placeholder="שם האולם או הבית"
+                            {...register("venueName", {
+                                required: "יש להזין מקום",
+                                validate: (value) => {
+                                    const length = value.trim().length;
+                                    return (
+                                        (length >= 2 && length <= 100) ||
+                                        "בין 2 ל־100 תווים"
+                                    );
+                                },
+                            })}
+                        />
+                        {errors.venueName && (
+                            <p role="alert" className="field-error">{errors.venueName.message}</p>
+                        )}
+                    </div>
+
+                    {/* כתובת */}
+                    <div className="field">
+                        <label htmlFor="address" className="label">כתובת <span className="font-normal text-muted">(רשות)</span></label>
+                        <input
+                            id="address"
+                            className="input"
+                            placeholder="רחוב, מספר ועיר"
+                            {...register("address", {
+                                maxLength: {
+                                    value: 200,
+                                    message: "עד 200 תווים",
+                                },
+                            })}
+                        />
+                        {errors.address && (
+                            <p role="alert" className="field-error">{errors.address.message}</p>
+                        )}
+                    </div>
+
+
+                    {/* תיאור */}
+                    <div className="field sm:col-span-2">
+                        <label htmlFor="description" className="label">תיאור <span className="font-normal text-muted">(רשות)</span></label>
+                        <textarea
+                            id="description"
+                            rows={4}
+                            className="input resize-y"
+                            placeholder="פרטים נוספים, הסעות, קוד לבוש..."
+                            {...register("description", {
+                                maxLength: {
+                                    value: 1000,
+                                    message: "עד 1000 תווים",
+                                },
+                            })}
+                        />
+                        {errors.description && (
+                            <p role="alert" className="field-error">{errors.description.message}</p>
+                        )}
+                    </div>
+
+                    {/* תמונה - רק בהוספה. בעריכה מנהלים את התמונה בדף פרטי השמחה */}
+                    {showImage && (
+                    <div className="field sm:col-span-2">
+                        <label htmlFor="celebration-form-image" className="label">תמונה <span className="font-normal text-muted">(רשות · JPG, PNG או WEBP, עד 2MB)</span></label>
+                        <input id="celebration-form-image" type="file" className="input" accept="image/jpeg,image/png,image/webp" {...register("image", { validate: validateImage })} />
+                        {errors.image && <p role="alert" className="field-error">{errors.image.message}</p>}
+                    </div>
                     )}
                 </div>
 
-                {/* מקום */}
-                <div>
-                    <label htmlFor="venueName">מקום</label>
-                    <input
-                        id="venueName"
-                        {...register("venueName", {
-                            required: "יש להזין מקום",
-                            validate: (value) => {
-                                const length = value.trim().length;
-                                return (
-                                    (length >= 2 && length <= 100) ||
-                                    "בין 2 ל־100 תווים"
-                                );
-                            },
-                        })}
-                    />
-                    {errors.venueName && (
-                        <p role="alert">{errors.venueName.message}</p>
-                    )}
-                </div>
-
-                {/* כתובת */}
-                <div>
-                    <label htmlFor="address">כתובת</label>
-                    <input
-                        id="address"
-                        {...register("address", {
-                            maxLength: {
-                                value: 200,
-                                message: "עד 200 תווים",
-                            },
-                        })}
-                    />
-                    {errors.address && (
-                        <p role="alert">{errors.address.message}</p>
-                    )}
-                </div>
-
-
-                {/* תיאור */}
-                <div>
-                    <label htmlFor="description">תיאור</label>
-                    <textarea
-                        id="description"
-                        rows={4}
-                        {...register("description", {
-                            maxLength: {
-                                value: 1000,
-                                message: "עד 1000 תווים",
-                            },
-                        })}
-                    />
-                    {errors.description && (
-                        <p role="alert">{errors.description.message}</p>
-                    )}
-                </div>
-                <input type="file" accept="image/jpeg,image/png,image/webp" {...register("image", { validate: validateImage })} />
-                {errors.image && <p role="alert">{errors.image.message}</p>}
                 <GroupCheckBoxes groups={groups} />
 
 
                 {/* שגיאה כללית */}
                 {
                     errors.root && (
-                        <p role="alert">{errors.root.message}</p>
+                        <p role="alert" className="form-alert">{errors.root.message}</p>
                     )
                 }
 
-                <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "שומרת..." : submitLabel}
-                </button>
+                <div className="sticky bottom-24 z-20 flex gap-2 rounded-full border border-white/80 bg-[var(--glass)] p-2 shadow-float backdrop-blur-2xl md:bottom-4 dark:border-white/10">
+                    <button type="submit" className="btn btn-primary btn-lg flex-1" disabled={isSubmitting}>
+                        <Icon name="check" /> {isSubmitting ? "שומרת..." : submitLabel}
+                    </button>
 
-                <button type="button" onClick={onCancel}>
-                    ביטול
-                </button>
+                    <button type="button" className="btn btn-secondary btn-lg" onClick={onCancel}>
+                        ביטול
+                    </button>
+                </div>
 
             </form>
         </FormProvider>

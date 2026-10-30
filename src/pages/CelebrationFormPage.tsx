@@ -7,6 +7,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import { celebrationToFormValues, emptyFormValues, formValuesToInput, type CelebrationFormValues } from "../utils/celebrationForm";
 import CelebrationForm from "../components/celebrations/CelebrationForm";
 import { ApiError } from "../api/api";
+import Icon from "../components/ui/Icon";
 
 
 export default function CelebrationFormPage() {
@@ -55,7 +56,7 @@ export default function CelebrationFormPage() {
       isEdit &&
       (!Number.isInteger(celebrationId) || celebrationId <= 0)
    ) {
-      return <p>שמחה לא נמצאה</p>;
+      return <p className="state-box">שמחה לא נמצאה</p>;
    }
 
 
@@ -71,7 +72,7 @@ export default function CelebrationFormPage() {
          celebrationQuery.error.status === 404
 
       if (celebrationNotFound) {
-         return <p>השמחה לא נמצאה</p>;
+         return <p className="state-box">השמחה לא נמצאה</p>;
       }
 
       return <ErrorMessage error={groupsQuery.error || celebrationQuery.error || todayQuery.error} />;
@@ -96,9 +97,10 @@ export default function CelebrationFormPage() {
    // 4. בדיקת הרשאת עריכה.
    if (isEdit && !celebration?.permissions.canEdit) {
       return (
-         <section>
+         <section className="state-box">
+            <Icon name="key" className="size-10 text-accent" />
             <p>אין לך הרשאה לערוך שמחה זו</p>
-            <Link to={`/celebrations/${celebrationId}`}>
+            <Link to={`/celebrations/${celebrationId}`} className="btn btn-secondary">
                חזרה לשמחה
             </Link>
          </section>
@@ -108,9 +110,10 @@ export default function CelebrationFormPage() {
    // 5. בדיקה שיש לפחות קבוצה אחת.
    if (groups.length === 0) {
       return (
-         <section>
+         <section className="state-box">
+            <Icon name="users" className="size-10 text-accent" />
             <p>כדי להוסיף שמחה צריך להיות חברה בקבוצה אחת לפחות</p>
-            <Link to="/groups">מעבר לקבוצות שלי</Link>
+            <Link to="/groups" className="btn btn-primary">מעבר לקבוצות שלי</Link>
          </section>
       );
    }
@@ -124,8 +127,14 @@ export default function CelebrationFormPage() {
       ? Math.min(celebration.hebrewDate.year, today.hebrewDate.year)
       : today.hebrewDate.year;
    return (
-      <section>
-         <h1>{isEdit ? "עריכת שמחה" : "הוספת שמחה"}</h1>
+      <section className="mx-auto max-w-3xl">
+         <header className="mb-10">
+            <p className="eyebrow">{isEdit ? "עריכה" : "שמחה חדשה"}</p>
+            <h1 className="page-title mt-2">{isEdit ? "עריכת שמחה." : "הוספת שמחה."}</h1>
+            <p className="mt-4 text-xl text-muted">
+               {isEdit ? "מעדכנים פרטים - וכל החברות בקבוצה יראו מיד." : "ממלאים כמה פרטים, וכל הקבוצה יודעת על השמחה."}
+            </p>
+         </header>
          <CelebrationForm
             defaultValues={initialValues}
             groups={groups}

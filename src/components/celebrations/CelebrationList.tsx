@@ -1,9 +1,11 @@
 
+import { motion } from "motion/react";
 import type { Celebration, PaginatedResponse } from "../../types";
-import Loading from "../Loading";
 import ErrorMessage from "../ErrorMessage";
 import EmptyState from "../EmptyState";
+import { CardSkeletonGrid } from "../Skeleton";
 import CelebrationCard from "./CelebrationCard";
+import { fadeUp, stagger } from "../../utils/motion";
 
 
 type CelebrationListProps =
@@ -18,7 +20,7 @@ type CelebrationListProps =
 export default function CelebrationList({ data, isPending, isError, error, isPlaceholderData }: CelebrationListProps) {
 
     if (isPending) {
-        return <Loading message="טוען אירועים..."/>
+        return <CardSkeletonGrid label="טוען אירועים..."/>
     }
     if (isError) {
         return <ErrorMessage error={error}/>
@@ -28,19 +30,24 @@ export default function CelebrationList({ data, isPending, isError, error, isPla
     }
     return (
         <section aria-live="polite">
-            <p>נמצאו {data.total}  שמחות</p>
-            <ul style={{ opacity: isPlaceholderData ? 0.5 : 1 }}>
+            <p className="mb-4 text-sm text-muted">נמצאו <strong className="text-ink">{data.total}</strong> שמחות</p>
+            <motion.ul
+                key={data.items.map((item) => item.id).join("-")}
+                initial="hidden"
+                animate="show"
+                variants={stagger(0.05)}
+                className={`list transition-opacity duration-300 ${isPlaceholderData ? "opacity-50" : ""}`}
+            >
                 {data.items.map(item =>
-                    <li key={item.id}>
+                    <motion.li key={item.id} variants={fadeUp}>
                         <CelebrationCard celebration={item}></CelebrationCard>
-                    </li>
+                    </motion.li>
                 )}
-            </ul>
+            </motion.ul>
         </section>
     )
-        
 
-    
+
+
 
 }
-

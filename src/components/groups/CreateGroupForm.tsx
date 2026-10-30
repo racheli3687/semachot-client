@@ -1,6 +1,7 @@
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import Icon from "../ui/Icon";
 import { useCreateGroup } from "../../hooks/useGroups";
 import type { CreateGroupRequest } from "../../types";
 
@@ -33,14 +34,22 @@ export default function CreateGroupForm() {
   }
 
   return (
-    <section>
-      <h2>יצירת קבוצה חדשה</h2>
+    <section className="panel flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <span className="grid size-12 shrink-0 place-items-center rounded-[0.9rem] bg-gradient-to-br from-[#8b7bff] to-[#4fb6ff] text-white shadow-float"><Icon name="plus" className="size-6" /></span>
+        <div>
+          <h2 className="card-title">יצירת קבוצה חדשה</h2>
+          <p className="hint">פותחים קבוצה ומזמינים אליה עם קוד.</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="group-name">שם הקבוצה</label>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <label htmlFor="group-name" className="label">שם הקבוצה</label>
 
         <input
           id="group-name"
+          className="input"
+          placeholder="למשל: משפחת לוי"
           {...register("name", {
             required: "יש להזין שם קבוצה",
             validate: (value) =>
@@ -53,10 +62,10 @@ export default function CreateGroupForm() {
           })}
         />
 
-        {errors.name && <p role="alert">{errors.name.message}</p>}
-        {errors.root && <p role="alert">{errors.root.message}</p>}
+        {errors.name && <p role="alert" className="field-error">{errors.name.message}</p>}
+        {errors.root && <p role="alert" className="form-alert">{errors.root.message}</p>}
 
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" className="btn btn-primary self-start" disabled={isSubmitting}>
           {isSubmitting ? "יוצרת קבוצה..." : "יצירת קבוצה"}
         </button>
       </form>

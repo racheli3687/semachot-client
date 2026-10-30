@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { ApiError } from "../api/api";
+import AuthShell from "../components/ui/AuthShell";
 
 type RegisterFormData = {
     fullName: string;
@@ -69,15 +70,14 @@ export default function RegisterPage() {
     }
 
     return (
-        <div>
-            <h1>הרשמה</h1>
-
-            <form onSubmit={handleSubmit(handleRegister)} noValidate>
-                <div>
-                    <label htmlFor="fullName">שם מלא</label>
+        <AuthShell title="מצטרפות לחגיגה." subtitle="פותחים חשבון בדקה, ומתחילים לשתף שמחות.">
+            <form onSubmit={handleSubmit(handleRegister)} noValidate className="flex flex-col gap-5">
+                <div className="field">
+                    <label htmlFor="fullName" className="label">שם מלא</label>
                     <input
                         id="fullName"
                         type="text"
+                        className="input"
                         autoComplete="name"
                         {...register("fullName", {
                             required: "יש להזין שם מלא",
@@ -95,15 +95,18 @@ export default function RegisterPage() {
                         })}
                     />
                     {errors.fullName && (
-                        <p role="alert">{errors.fullName.message}</p>
+                        <p role="alert" className="field-error">{errors.fullName.message}</p>
                     )}
                 </div>
 
-                <div>
-                    <label htmlFor="email">כתובת מייל</label>
+                <div className="field">
+                    <label htmlFor="email" className="label">כתובת מייל</label>
                     <input
                         id="email"
                         type="email"
+                        className="input"
+                        dir="ltr"
+                        placeholder="name@example.com"
                         autoComplete="email"
                         {...register("email", {
                             required: "יש להזין כתובת מייל",
@@ -114,15 +117,17 @@ export default function RegisterPage() {
                         })}
                     />
                     {errors.email && (
-                        <p role="alert">{errors.email.message}</p>
+                        <p role="alert" className="field-error">{errors.email.message}</p>
                     )}
                 </div>
 
-                <div>
-                    <label htmlFor="password">סיסמה</label>
+                <div className="field">
+                    <label htmlFor="password" className="label">סיסמה</label>
                     <input
                         id="password"
                         type="password"
+                        className="input"
+                        dir="ltr"
                         autoComplete="new-password"
                         {...register("password", {
                             required: "יש להזין סיסמה",
@@ -140,21 +145,23 @@ export default function RegisterPage() {
                                 "הסיסמה חייבת להכיל לפחות אות באנגלית אחת וספרה אחת",
                         })}
                     />
-                    {errors.password && (
-                        <p role="alert">{errors.password.message}</p>
+                    {errors.password ? (
+                        <p role="alert" className="field-error">{errors.password.message}</p>
+                    ) : (
+                        <p className="hint">לפחות 8 תווים, עם אות באנגלית וספרה</p>
                     )}
                 </div>
 
-                {serverError && <p role="alert">{serverError}</p>}
+                {serverError && <p role="alert" className="form-alert">{serverError}</p>}
 
-                <button type="submit" disabled={isSubmitting}>
+                <button type="submit" className="btn btn-primary btn-lg mt-1 w-full" disabled={isSubmitting}>
                     {isSubmitting ? "נרשמת..." : "יצירת חשבון"}
                 </button>
             </form>
 
-            <p>
-                כבר יש לך חשבון? <Link to="/login">להתחברות</Link>
+            <p className="mt-6 text-center text-sm text-muted">
+                כבר יש לך חשבון? <Link to="/login" className="font-semibold">להתחברות</Link>
             </p>
-        </div>
+        </AuthShell>
     );
 }

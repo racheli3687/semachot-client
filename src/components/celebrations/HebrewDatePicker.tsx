@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useConvertDateQuery, useHebrewMonthsQuery, useHebrewTodayQuery } from "../../hooks/useHebrewCalendar";
 import type { CelebrationFormValues } from "../../utils/celebrationForm";
+import Icon from "../ui/Icon";
 
 type HebrewDatePickerProps = {
     minYear: number;
@@ -75,26 +76,33 @@ export default function HebrewDatePicker({ minYear }: HebrewDatePickerProps) {
     const hasError = errors.hebrewYear || errors.hebrewMonth || errors.hebrewDay;
 
     return (
-        <fieldset>
-            <legend>תאריך עברי</legend>
+        <fieldset className="panel grid gap-5 sm:grid-cols-3">
+            <legend className="sr-only">תאריך עברי</legend>
+            <h2 className="card-title flex items-center gap-3 sm:col-span-3" aria-hidden="true">
+                <span className="step">2</span> מתי? <span className="text-sm font-normal text-muted">(תאריך עברי)</span>
+            </h2>
 
-            <div>
-                <label htmlFor="hebrewYear">שנה</label>
+            <div className="field">
+                <label htmlFor="hebrewYear" className="label">
+                    שנה
+                    {monthsData?.yearText && <span className="ms-1.5 font-normal text-muted">({monthsData.yearText})</span>}
+                </label>
                 <select
                     id="hebrewYear"
+                    className="input"
                     {...register("hebrewYear", { required: true })}
                 >
                     {years.map((y) => (
                         <option key={y} value={y}>{y}</option>
                     ))}
                 </select>
-                {monthsData?.yearText && <span> {monthsData.yearText}</span>}
             </div>
 
-            <div>
-                <label htmlFor="hebrewMonth">חודש</label>
+            <div className="field">
+                <label htmlFor="hebrewMonth" className="label">חודש</label>
                 <select
                     id="hebrewMonth"
+                    className="input"
                     disabled={months.length === 0}
                     {...register("hebrewMonth", { required: true })}
                 >
@@ -105,10 +113,11 @@ export default function HebrewDatePicker({ minYear }: HebrewDatePickerProps) {
                 </select>
             </div>
 
-            <div>
-                <label htmlFor="hebrewDay">יום</label>
+            <div className="field">
+                <label htmlFor="hebrewDay" className="label">יום</label>
                 <select
                     id="hebrewDay"
+                    className="input"
                     {...register("hebrewDay", { required: true })}
                 >
                     {daysArr.map((d) => (
@@ -117,11 +126,13 @@ export default function HebrewDatePicker({ minYear }: HebrewDatePickerProps) {
                 </select>
             </div>
             {gregorianText && (
-                <p>יוצא ב{gregorianText}</p>
+                <p className="flex items-center gap-2 rounded-2xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent sm:col-span-3">
+                    <Icon name="sparkle" className="size-4" /> יוצא ב{gregorianText}
+                </p>
             )}
 
             {hasError && (
-                <p role="alert">
+                <p role="alert" className="field-error sm:col-span-3">
                     {errors.hebrewDay?.message || "יש לבחור תאריך מלא"}
                 </p>
             )}

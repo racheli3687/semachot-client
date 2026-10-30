@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { celebrationParamsFromSearch, type DashboardView } from "../utils/celebrationFilters";
 import { useHebrewTodayQuery } from "../hooks/useHebrewCalendar";
 import type { HebrewMonth } from "../types";
@@ -8,6 +8,10 @@ import TodayCelebrations from "../components/celebrations/TodayCelebrations";
 import CelebrationFilters from "../components/celebrations/CelebrationFilters";
 import ViewToggle from "../components/celebrations/ViewToggle";
 import Loading from "../components/Loading";
+import { motion } from "motion/react";
+import { fadeUp, stagger } from "../utils/motion";
+import DashboardWidgets from "../components/dashboard/DashboardWidgets";
+import { useAuth } from "../hooks/useAuth";
 
 export default function DashboardPage() {
    const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +22,9 @@ export default function DashboardPage() {
 
    // החודש שהלוח מציג: מהכתובת, ואם אין - החודש העברי הנוכחי
    const { data: today } = useHebrewTodayQuery();
+
+   // לפתיחה בלבד (תצוגה): השם
+   const { user } = useAuth();
    const calendarYear = params.hebrewYear ?? today?.hebrewDate.year;
    const calendarMonth = params.hebrewMonth ?? today?.hebrewDate.month;
 
@@ -86,13 +93,39 @@ export default function DashboardPage() {
 
    return (
       <>
-         <h1>הלוח שלי</h1>
+         {/* פתיחה */}
+         <motion.header initial="hidden" animate="show" variants={stagger(0.1)} className="mb-10 sm:mb-14">
+            <motion.p variants={fadeUp} className="eyebrow">
+               {user ? `שלום, ${user.fullName.split(" ")[0]}` : "\u00a0"}
+            </motion.p>
+            <motion.h1 variants={fadeUp} className="page-title mt-2">
+               כל השמחות.
+               <br />
+               במקום אחד.
+            </motion.h1>
+            <motion.p variants={fadeUp} className="mt-4 max-w-2xl text-xl leading-relaxed text-muted sm:text-2xl">
+               החתונות, הבריתות והקידושים של המשפחה והחברות, בלוח עברי אחד משותף.
+            </motion.p>
+         </motion.header>
 
-         <TodayCelebrations />
+         {/* ווידג'טים */}
+         <motion.section
+            initial="hidden"
+            animate="show"
+            variants={stagger(0.08, 0.2)}
+            aria-label="סיכום"
+            className="mb-16 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-[1.35fr_1fr_1fr]"
+         >
+            <motion.div variants={fadeUp} className="col-span-2 lg:col-span-1 lg:row-span-2">
+               <TodayCelebrations />
+            </motion.div>
+            <DashboardWidgets />
+         </motion.section>
 
-         <Link to="/celebrations/new">+ הוספת שמחה</Link>
-
-         <ViewToggle value={view} onChange={changeView} />
+         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <h2 className="section-title">{view === "list" ? "השמחות שלך" : "לוח חודשי"}</h2>
+            <ViewToggle value={view} onChange={changeView} />
+         </div>
 
          <CelebrationFilters
             view={view}

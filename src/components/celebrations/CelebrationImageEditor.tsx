@@ -4,6 +4,7 @@ import type { Celebration } from "../../types";
 import { useDeleteCelebrationImage, useUploadCelebrationImage } from "../../hooks/useCelebrations";
 import { validateImage } from "../../utils/celebrationForm";
 import ErrorMessage from "../ErrorMessage";
+import Icon from "../ui/Icon";
 
 type CelebrationImageEditorProps = {
     celebration: Celebration;
@@ -58,31 +59,36 @@ export default function CelebrationImageEditor({ celebration }: CelebrationImage
     }
 
     return (
-        <section aria-label="תמונת השמחה">
-            <h2>תמונה</h2>
+        <section aria-label="תמונת השמחה" className="panel flex flex-col gap-4">
+            <h2 className="card-title">תמונה</h2>
 
-            <label htmlFor="celebration-image">
-                {hasImage ? "החלפת התמונה" : "הוספת תמונה"} (JPG, PNG או WEBP, עד 2MB)
-            </label>
-            <input
-                key={inputKey}
-                id="celebration-image"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleFileChange}
-                disabled={isBusy}
-            />
-            {fileError && <p role="alert">{fileError}</p>}
+            <div className="field">
+                <label htmlFor="celebration-image" className="hint">
+                    {hasImage ? "החלפת התמונה" : "הוספת תמונה"} (JPG, PNG או WEBP, עד 2MB)
+                </label>
+                <input
+                    key={inputKey}
+                    id="celebration-image"
+                    type="file"
+                    className="input"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleFileChange}
+                    disabled={isBusy}
+                />
+                {fileError && <p role="alert" className="field-error">{fileError}</p>}
+            </div>
 
-            <button type="button" onClick={handleUpload} disabled={!file || isBusy}>
-                {uploadMutation.isPending ? "מעלה..." : "העלאה"}
-            </button>
-
-            {hasImage && (
-                <button type="button" onClick={handleRemove} disabled={isBusy}>
-                    {deleteImageMutation.isPending ? "מסירה..." : "הסרת התמונה"}
+            <div className="flex flex-wrap gap-3">
+                <button type="button" className="btn btn-secondary" onClick={handleUpload} disabled={!file || isBusy}>
+                    <Icon name="image" /> {uploadMutation.isPending ? "מעלה..." : "העלאה"}
                 </button>
-            )}
+
+                {hasImage && (
+                    <button type="button" className="btn btn-danger" onClick={handleRemove} disabled={isBusy}>
+                        {deleteImageMutation.isPending ? "מסירה..." : "הסרת התמונה"}
+                    </button>
+                )}
+            </div>
 
             {uploadMutation.isError && <ErrorMessage error={uploadMutation.error} />}
             {deleteImageMutation.isError && <ErrorMessage error={deleteImageMutation.error} />}
