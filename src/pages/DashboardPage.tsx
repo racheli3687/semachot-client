@@ -1,12 +1,25 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { celebrationParamsFromSearch } from "../utils/celebrationFilters";
+import { celebrationParamsFromSearch, type DashboardView } from "../utils/celebrationFilters";
+import { useHebrewTodayQuery } from "../hooks/useHebrewCalendar";
+import type { HebrewMonth } from "../types";
 import CelebrationListView from "../components/celebrations/CelebrationListView";
-import TodayCelebration from "../components/celebrations/TodayCelebrations";
+import CelebrationCalendarView from "../components/calendar/CelebrationCalendarView";
+import TodayCelebrations from "../components/celebrations/TodayCelebrations";
 import CelebrationFilters from "../components/celebrations/CelebrationFilters";
+import ViewToggle from "../components/celebrations/ViewToggle";
+import Loading from "../components/Loading";
 
 export default function DashboardPage() {
    const [searchParams, setSearchParams] = useSearchParams();
    const params = celebrationParamsFromSearch(searchParams);
+
+   // סוג התצוגה: רשימה (ברירת מחדל) או לוח
+   const view: DashboardView = searchParams.get("view") === "calendar" ? "calendar" : "list";
+
+   // החודש שהלוח מציג: מהכתובת, ואם אין - החודש העברי הנוכחי
+   const { data: today } = useHebrewTodayQuery();
+   const calendarYear = params.hebrewYear ?? today?.hebrewDate.year;
+   const calendarMonth = params.hebrewMonth ?? today?.hebrewDate.month;
 
    function changePage(page: number) {
       const next = new URLSearchParams(searchParams);
@@ -14,8 +27,6 @@ export default function DashboardPage() {
       setSearchParams(next);
       window.scrollTo({ top: 0 });
    }
-
-
 
    function updateFilter(key: string, value: string | undefined) {
       const next = new URLSearchParams(searchParams);
@@ -32,33 +43,75 @@ export default function DashboardPage() {
 
    function updateHebrewYear(year: string | undefined) {
       const next = new URLSearchParams(searchParams);
-      if (!year)
+
+      if (!year) {
          next.delete("hebrewYear");
-      else {
+      } else {
          next.set("hebrewYear", year);
       }
+
       next.delete("hebrewMonth");
       next.delete("page");
-      setSearchParams(next)
+      setSearchParams(next);
+   }
+
+   function changeView(nextView: DashboardView) {
+      const next = new URLSearchParams(searchParams);
+
+      if (nextView === "calendar") {
+         next.set("view", "calendar");
+      } else {
+         next.delete("view");
+      }
+
+      next.delete("page");
+      setSearchParams(next);
+   }
+
+   function changeCalendarMonth(year: number, month: HebrewMonth) {
+      const next = new URLSearchParams(searchParams);
+      next.set("hebrewYear", String(year));
+      next.set("hebrewMonth", month);
+      next.delete("page");
+      setSearchParams(next);
    }
 
    function clearFilters() {
-      setSearchParams({});
+      // הניקוי לא מחזיר מהלוח לרשימה
+      setSearchParams(view === "calendar" ? { view: "calendar" } : {});
    }
-
 
    return (
       <>
          <h1>הלוח שלי</h1>
-         <TodayCelebration />
+
+         <TodayCelebrations />
+
          <Link to="/celebrations/new">+ הוספת שמחה</Link>
+
+         <ViewToggle value={view} onChange={changeView} />
+
          <CelebrationFilters
+            view={view}
             values={searchParams}
             onChange={updateFilter}
             onHebrewYearChange={updateHebrewYear}
             onClear={clearFilters}
          />
-         <CelebrationListView params={params} onPageChange={changePage} />
+
+         {view === "list" ? (
+            <CelebrationListView params={params} onPageChange={changePage} />
+         ) : calendarYear && calendarMonth ? (
+            <CelebrationCalendarView
+               key={`${calendarYear}-${calendarMonth}`}
+               filters={params}
+               year={calendarYear}
+               month={calendarMonth}
+               onMonthChange={changeCalendarMonth}
+            />
+         ) : (
+            <Loading message="טוען את הלוח..." />
+         )}
       </>
    );
 }

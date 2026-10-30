@@ -10,11 +10,15 @@ import type { CelebrationInput, GetCelebrationsParams } from "../types";
 import { createCelebration, deleteCelebration, deleteCelebrationImage, getCelebration, getCelebrations, getCelebrationTypes, getTodayCelebrations, updateCelebration, uploadCelebrationImage } from "../api/celebrationsApi";
 import { removeCelebrationFromGroup } from "../api/groupsApi";
 
-export function useCelebrationsQuery(params: GetCelebrationsParams) {
+export function useCelebrationsQuery(
+  params: GetCelebrationsParams,
+  options: { enabled?: boolean } = {}
+) {
   return useQuery({
     queryKey: ["celebrations", params],
     queryFn: () => getCelebrations(params),
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
+    enabled: options.enabled ?? true,
   });
 }
 

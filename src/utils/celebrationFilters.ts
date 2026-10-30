@@ -1,5 +1,5 @@
 import type { CelebrationSort, CelebrationType, CelebrationWhen, GetCelebrationsParams, HebrewMonth } from "../types";
-
+export type DashboardView = "list" | "calendar";
 export const CELEBRATION_WHEN: readonly CelebrationWhen[] = ["all", "past", "upcoming"]
 export const CELEBRATION_SORTS: readonly CelebrationSort[] = ["date_asc", "date_desc", "created_desc"]
 export const CELEBRATION_TYPES: readonly CelebrationType[] = [
