@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 
 import type { CelebrationInput, GetCelebrationsParams } from "../types";
-import { createCelebration, getCelebration, getCelebrations, getCelebrationTypes, getTodayCelebrations, updateCelebration, uploadCelebrationImage } from "../api/celebrationsApi";
+import { createCelebration, deleteCelebration, deleteCelebrationImage, getCelebration, getCelebrations, getCelebrationTypes, getTodayCelebrations, updateCelebration, uploadCelebrationImage } from "../api/celebrationsApi";
 import { removeCelebrationFromGroup } from "../api/groupsApi";
 
 export function useCelebrationsQuery(params: GetCelebrationsParams) {
@@ -133,6 +133,36 @@ export function useUploadCelebrationImage() {
       queryClient.invalidateQueries({
         queryKey: ["celebration", variables.id],
       });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
+    },
+  });
+}
+export function useDeleteCelebration() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteCelebration(id),
+
+    onSuccess: (_data, id) => {
+      // השמחה כבר לא קיימת - מוחקים אותה מהמטמון
+      queryClient.removeQueries({ queryKey: ["celebration", id] });
+      // הרשימות השתנו - מרעננים
+      queryClient.invalidateQueries({ queryKey: ["celebrations"] });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
+    },
+  });
+}
+
+export function useDeleteCelebrationImage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteCelebrationImage(id),
+
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["celebration", id] });
+      queryClient.invalidateQueries({ queryKey: ["celebrations"] });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
     },
   });
 }
