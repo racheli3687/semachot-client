@@ -27,7 +27,7 @@ export default function SearchBox({ initialValue, onSearch }: SearchBoxProps) {
         type="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="הקלד כאן כדי לחפש"
+        placeholder="כותרת, מקום או שם"
       />
       <button type="submit">חיפוש</button>
       {text && (

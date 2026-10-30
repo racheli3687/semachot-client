@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteGroup, useGroupQuery, useLeaveGroup } from "../hooks/useGroups";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
@@ -6,13 +6,14 @@ import GroupMembers from "../components/groups/GroupMembers";
 import UpdateGroupForm from "../components/groups/UpdateGroupForm";
 import GroupJoinCode from "../components/groups/GroupJoinCode";
 import GroupCelebrations from "../components/groups/GroupCelebrations";
+import { ApiError } from "../api/api";
 
 export default function GroupPage() {
 
    const navigate = useNavigate();
    const leaveMutation = useLeaveGroup();
    const deleteMutation = useDeleteGroup();
-   const { id:groupId } = useParams<{ id: string }>();
+   const { id: groupId } = useParams<{ id: string }>();
    const id = Number(groupId);
    const groupQuery = useGroupQuery(id);
 
@@ -25,6 +26,15 @@ export default function GroupPage() {
    }
 
    if (groupQuery.isError) {
+      // 404 = הקבוצה לא קיימת, או שאני לא חברה בה
+      if (groupQuery.error instanceof ApiError && groupQuery.error.status === 404) {
+         return (
+            <section>
+               <p>הקבוצה לא נמצאה</p>
+               <Link to="/groups">חזרה לקבוצות שלי</Link>
+            </section>
+         );
+      }
       return <ErrorMessage error={groupQuery.error} />;
    }
 
@@ -73,7 +83,7 @@ export default function GroupPage() {
    }
 
    return (
-      <main>
+      <section>
          <h1>{group.name}</h1>
          <p>תפקיד: {group.myRole === "MANAGER" ? "מנהלת" : "חברה"}</p>
          <p>מספר חברות וחברים: {group.memberCount}</p>
@@ -115,6 +125,6 @@ export default function GroupPage() {
                {deleteMutation.isPending ? "מוחקת..." : "מחיקת הקבוצה"}
             </button>
          )}
-      </main>
+      </section>
    );
 }

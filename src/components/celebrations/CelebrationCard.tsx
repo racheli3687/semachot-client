@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Celebration } from "../../types";
+import { formatGregorianDate } from "../../utils/dates";
 
 interface CelebrationCardProps {
   celebration: Celebration;
@@ -33,7 +34,7 @@ export default function CelebrationCard({
       <p>תאריך עברי: {celebration.hebrewDate.text}</p>
 
       <p>
-        תאריך: {celebration.date}, שעה: {celebration.time}
+               תאריך: {formatGregorianDate(celebration.date)}, שעה: {celebration.time}
       </p>
 
       <p>מקום: {celebration.venueName}</p>

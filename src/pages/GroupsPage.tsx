@@ -5,7 +5,7 @@ import JoinGroupForm from "../components/groups/JoinGroupForm";
 
 export default function GroupsPage() {
   return (
-    <main>
+    <section>
       <h1>הקבוצות שלי</h1>
 
       <CreateGroupForm />
@@ -20,6 +20,6 @@ export default function GroupsPage() {
 
 
       
-    </main>
+    </section>
   );
 }

@@ -6,7 +6,7 @@ import {
     useHebrewMonthsQuery,
     useHebrewTodayQuery,
 } from "../../hooks/useHebrewCalendar";
-import { HEBREW_DAY_LETTERS } from "../../utils/hebrewCalendar";
+import { HEBREW_DAY_LETTERS, findMonthInYear } from "../../utils/hebrewCalendar";
 import { weekdayOf } from "../../utils/dates";
 import Loading from "../Loading";
 import ErrorMessage from "../ErrorMessage";
@@ -27,8 +27,8 @@ export default function CelebrationCalendarView({
     // 1. החודשים של השנה - כמה ימים בכל חודש, ובאיזה סדר
     const monthsQuery = useHebrewMonthsQuery(year);
     const months = monthsQuery.data?.months ?? [];
-    // אם החודש מהכתובת לא קיים בשנה (למשל ADAR בשנה מעוברת) - החודש הראשון
-    const monthInfo = months.find((m) => m.month === month) ?? months[0];
+    // החודש להצגה. אם החודש מהכתובת לא קיים בשנה - האדר המתאים (ראי findMonthInYear)
+    const monthInfo = findMonthInYear(months, month);
 
     // 2. באיזה תאריך לועזי (ולכן באיזה יום בשבוע) מתחיל החודש
     const firstDayQuery = useConvertDateQuery(
@@ -56,11 +56,14 @@ export default function CelebrationCalendarView({
     // 4. היום - לסימון במסגרת, ולבחירה התחלתית
     const { data: today } = useHebrewTodayQuery();
     const isThisMonth =
-        today?.hebrewDate.year === year && today?.hebrewDate.month === month;
+        today?.hebrewDate.year === year && today?.hebrewDate.month === monthInfo?.month;
 
-    const [selectedDay, setSelectedDay] = useState<number | null>(
-        isThisMonth && today ? today.hebrewDate.day : null
-    );
+    // היום שהמשתמשת בחרה בלחיצה. null = עוד לא בחרה
+    const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
+    // היום שמוצג כבחור: מה שנבחר בלחיצה, ואם לא נבחר כלום - היום (אם זה החודש הנוכחי).
+    // מחושב בכל רינדור, ולכן מתעדכן גם כש"היום" מגיע מהשרת אחרי שהלוח כבר הוצג.
+    const shownDay = selectedDay ?? (isThisMonth && today ? today.hebrewDate.day : null);
 
     if (monthsQuery.isError) return <ErrorMessage error={monthsQuery.error} />;
     if (firstDayQuery.isError) return <ErrorMessage error={firstDayQuery.error} />;
@@ -105,21 +108,23 @@ export default function CelebrationCalendarView({
                     firstDate={firstDayQuery.data.date}
                     celebrationsByDay={celebrationsByDay}
                     todayDay={isThisMonth && today ? today.hebrewDate.day : null}
-                    selectedDay={selectedDay}
+                    selectedDay={shownDay}
                     onSelectDay={setSelectedDay}
                 />
             </div>
-
+            {(celebrationsQuery.isPending || celebrationsQuery.isPlaceholderData) && (
+                <Loading message="טוען שמחות..." />
+            )}
             {celebrationsQuery.isError && <ErrorMessage error={celebrationsQuery.error} />}
 
             {data && data.total > data.items.length && (
                 <p>מוצגות {data.items.length} השמחות הראשונות מתוך {data.total}. אפשר לצמצם בעזרת הסינון.</p>
             )}
 
-            {selectedDay !== null && (
+            {shownDay !== null && (
                 <DayCelebrations
-                    title={`${HEBREW_DAY_LETTERS[selectedDay - 1]} ${monthInfo.name}`}
-                    celebrations={celebrationsByDay.get(selectedDay) ?? []}
+                    title={`${HEBREW_DAY_LETTERS[shownDay - 1]} ${monthInfo.name}`}
+                    celebrations={celebrationsByDay.get(shownDay) ?? []}
                 />
             )}
         </section>

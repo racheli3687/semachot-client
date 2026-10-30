@@ -60,8 +60,11 @@ export default function DashboardPage() {
 
       if (nextView === "calendar") {
          next.set("view", "calendar");
-      } else {
+      }else {
          next.delete("view");
+         // החודש נכתב בכתובת בגלל הדפדוף בלוח, ולא בגלל שנבחר כסינון
+         next.delete("hebrewYear");
+         next.delete("hebrewMonth");
       }
 
       next.delete("page");

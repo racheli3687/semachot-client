@@ -16,7 +16,7 @@ import {
   removeGroupMember,
   leaveGroup,
   deleteGroup,
-  
+
 } from "../api/groupsApi";
 
 import type {
@@ -63,12 +63,12 @@ export function useJoinGroup() {
 }
 
 export function useGroupQuery(groupId: number) {
-  
+
 
   return useQuery({
     queryKey: ["groups", groupId],
     queryFn: () => getGroup(groupId),
-    enabled:Number.isFinite(groupId) && groupId > 0,
+    enabled: Number.isFinite(groupId) && groupId > 0,
   });
 }
 
@@ -131,12 +131,17 @@ export function useRemoveGroupMember() {
 
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["groups", variables.groupId,"members"],
+        queryKey: ["groups", variables.groupId, "members"],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["groups",variables.groupId],
+        queryKey: ["groups", variables.groupId],
       });
+
+      // השמחות של מי שהוסרה יוצאות מהקבוצה - מרעננים את כל רשימות השמחות
+      queryClient.invalidateQueries({ queryKey: ["celebrations"] });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
+      queryClient.invalidateQueries({ queryKey: ["celebration"] });
     },
   });
 }
@@ -152,7 +157,7 @@ export function useLeaveGroup() {
         queryKey: ["groups", groupId],
       });
       queryClient.removeQueries({
-        queryKey: ["groups", groupId,"members"],
+        queryKey: ["groups", groupId, "members"],
       });
 
       queryClient.invalidateQueries({
@@ -162,6 +167,8 @@ export function useLeaveGroup() {
       queryClient.invalidateQueries({
         queryKey: ["celebrations"],
       });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
+      queryClient.invalidateQueries({ queryKey: ["celebration"] });
     },
   });
 }
@@ -186,6 +193,8 @@ export function useDeleteGroup() {
       queryClient.invalidateQueries({
         queryKey: ["celebrations"],
       });
+      queryClient.invalidateQueries({ queryKey: ["celebrationsToday"] });
+      queryClient.invalidateQueries({ queryKey: ["celebration"] });
     },
   });
 }
