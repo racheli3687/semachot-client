@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getHebrewMonths, getHebrewToday } from "../api/hebrewCalendarApi";
+import { convertDate, getHebrewMonths, getHebrewToday } from "../api/hebrewCalendarApi";
+import type { HebrewMonth } from "../types";
 
 
 export function useHebrewTodayQuery() {
@@ -22,4 +23,18 @@ export function useHebrewMonthsQuery(year: number | undefined) {
             staleTime: Infinity
         }
     );
+}
+// המרת תאריך עברי ללועזי - לתצוגה מקדימה בטופס
+export function useConvertDateQuery(
+  day: number | undefined,
+  month: HebrewMonth | undefined,
+  year: number | undefined
+) {
+  return useQuery({
+    queryKey: ["convertDate", year, month, day],
+    queryFn: () => convertDate({ day, month, year }),
+    enabled: day !== undefined && month !== undefined && year !== undefined,
+    staleTime: Infinity,
+    retry: false,
+  });
 }
